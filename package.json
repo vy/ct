@@ -1,0 +1,20 @@
+{
+  "name": "ct",
+  "description": "cross-traffic emulator",
+  "author": "Volkan Yazıcı <volkan.yazici@gmail.com>",
+  "dependencies": {
+    "bignum": "0.6.x",
+  	"log4js": "0.6.x",
+    "moment": "2.5.x",
+    "netmask": "1.0.x",
+    "optimist": "0.6.x",
+    "printf": "0.1.x"
+  },
+  "devDependencies": {
+    "codo": "2.0.x",
+    "coffee-script": "1.7.x",
+    "jasmine-node": "1.13.x",
+    "memorystream": "0.2.x"
+  },
+  "engine": "node 0.10.x"
+}
