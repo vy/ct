@@ -56,7 +56,7 @@ class exports.Server
     # Updates statistics for the given received message.
     # @private
     _consumeMessage: (connId, msg) ->
-        @_log.trace "Received message #{msg}."
+        @_log.trace "[#{connId}] Received message #{msg}."
         latency = commons.getTime() - msg.timestamp
         hostId = msg.hostId
         @_connHostIds[connId] ?= hostId
@@ -73,14 +73,15 @@ class exports.Server
     # Removes related data structure entries for the given connection.
     # @private
     _removeConn: (connId, error) ->
-        @_log.error("Connection #{connId} failure: #{error}") if error?
-        @_log.debug "Removing connection #{connId}..."
-        hostId = @_connHostIds[connId]
-        throughput = @_connDataTput[connId].throughput()
-        @_hostDataTput[hostId] ?= new commons.MeanObserver()
-        @_hostDataTput[hostId].update throughput
-        delete @_connDataTput[connId]
-        delete @_connHostIds[connId]
+        @_log.error("[#{connId}] Connection failure: #{error}") if error?
+        @_log.debug "[#{connId}] Removing connection..."
+        if connId of @_connHostIds
+            hostId = @_connHostIds[connId]
+            throughput = @_connDataTput[connId].throughput()
+            @_hostDataTput[hostId] ?= new commons.MeanObserver()
+            @_hostDataTput[hostId].update throughput
+            delete @_connDataTput[connId]
+            delete @_connHostIds[connId]
         delete @_consumers[connId]
 
     # Creates a connection id for the given `socket`.
@@ -94,7 +95,7 @@ class exports.Server
     _acceptConn: (socket) ->
         @_connTput.update(1)
         connId = Server._createConnId socket
-        @_log.debug "Accepted connection #{connId}."
+        @_log.debug "[#{connId}] Accepted connection."
         onMessage = (message) => @_consumeMessage connId, message
         onEnd = (error) => @_removeConn connId, error
         @_consumers[connId] = new message.MessageConsumer connId, socket, onMessage, onEnd
