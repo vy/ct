@@ -1,6 +1,6 @@
 # Parse command line arguments.
 {argv} = require "optimist"
-    .usage "Start the cross-traffic server.\nUsage: $0"
+    .usage "Start the periodic cross-traffic client.\nUsage: $0"
     .demand "s"
     .alias "s", "serverSubnet"
     .describe "s", "server address subnet (e.g., 10.1.0.0/16)"
@@ -23,9 +23,9 @@
     .describe "t", "variation window of the flow lifetime"
 
 {Netmask} = require "netmask"
-{Client} = require "../client"
+{PeriodicClient} = require "../periodicClient"
 serverSubnet = new Netmask argv.serverSubnet
-client = new Client \
+client = new PeriodicClient \
     serverSubnet, argv.nServers, argv.nConns, argv.hostId, \
     argv.lifetime, argv.lifetimeThreshold
 client.start()

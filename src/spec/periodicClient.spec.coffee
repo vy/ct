@@ -1,7 +1,7 @@
 net = require "net"
 {Netmask} = require "netmask"
 
-{Client} = require "../client"
+{PeriodicClient} = require "../periodicClient"
 commons = require "../commons"
 
 
@@ -12,7 +12,7 @@ describe "client test suite", ->
 		connCount = 1
 		hostId = 0xDEAD
 		subnet = new Netmask "#{serverAddr}/32"
-		client = new Client subnet, 1, connCount, hostId, 10000, 0
+		client = new PeriodicClient subnet, 1, connCount, hostId, 10000, 0
 		server = net.createServer()
 		server.on "error", -> done false
 		server.listen commons.serverDataPort, serverAddr, 1, ->
@@ -27,7 +27,7 @@ describe "client test suite", ->
 		connCount = 10
 		hostId = 0xDEAD
 		subnet = new Netmask "#{serverAddr}/32"
-		client = new Client subnet, 1, connCount, hostId, 10000, 0
+		client = new PeriodicClient subnet, 1, connCount, hostId, 10000, 0
 		server = net.createServer()
 		server.on "error", -> done false
 		server.listen commons.serverDataPort, serverAddr, 1, ->

@@ -22,7 +22,7 @@ restartDamper = (iniWaitPeriod, maxWaitPeriod, body) ->
     run()
 
 
-class exports.Client
+class exports.PeriodicClient
 
     # @property [logger.Logger] instance logger
     # @private
@@ -59,7 +59,7 @@ class exports.Client
     # @param [Integer] lifetime flow lifetime in milliseconds
     # @param [Integer] lifetimeThreshold variation window of the flow lifetime
     constructor: (@serverSubnet, @serverCount, @connCount, @hostId, @lifetime, @lifetimeThreshold) ->
-        @_log = new logger.Logger("Client")
+        @_log = new logger.Logger("PeriodicClient")
         @_log.setLevel("WARN")
         addrs = []
         @serverSubnet.forEach (addr) -> addrs.push addr
@@ -86,7 +86,7 @@ class exports.Client
     # @private
     _startProducer: ->
         restartDamper 100, message.MessageProducer.timeoutPeriod, (restart) =>
-            connId = Client._createConnId()
+            connId = PeriodicClient._createConnId()
             serverAddr = @_serverAddrs[commons.randInt(0, @_serverAddrs.length)]
             socket = new net.Socket()
             lifetime = @_randLifetime()

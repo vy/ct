@@ -44,11 +44,11 @@ Usage
 
 	Missing required arguments: f
 
-and `client.js`.
+and `periodicClient.js`.
 
-	$ node out/exec/client.exec.js 
-	Start the cross-traffic server.
-	Usage: node ./out/exec/client.exec.js
+	$ node out/exec/periodicClient.exec.js
+	Start the periodic cross-traffic client.
+	Usage: node ./out/exec/periodicClient.exec.js
 
 	Options:
 	  -s, --serverSubnet       server address subnet (e.g., 10.1.0.0/16)  [required]
@@ -66,7 +66,7 @@ In your `mininet` setup, start `ct` servers on server hosts as follows.
 
 Next, start clients by providing necessary command line arguments.
 
-	$ node out/exec/client.exec.js \
+	$ node out/exec/periodicClient.exec.js \
 		--serverSubnet 10.1.0.0/16 \
 		--nServers 2 \
 		--nConns 10 \
