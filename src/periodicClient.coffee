@@ -1,6 +1,6 @@
-printf = require "printf"
 net = require "net"
 
+client = require "./client"
 commons = require "./commons"
 logger = require "./logger"
 message = require "./message"
@@ -22,7 +22,7 @@ restartDamper = (iniWaitPeriod, maxWaitPeriod, body) ->
     run()
 
 
-class exports.PeriodicClient
+class exports.PeriodicClient extends client.Client
 
     # @property [logger.Logger] instance logger
     # @private
@@ -45,13 +45,6 @@ class exports.PeriodicClient
     # @property [Integer] number of concurrent connections
     connCount: null
 
-    # @property [Integer] host id
-    hostId: null
-
-    # @property [Boolean] running state flag
-    # @private
-    _running: false
-
     # @param [netmask.Netmask] serverSubnet server network subnet
     # @param [Integer] serverCount number of servers
     # @param [Integer] connCount number of concurrent connections
@@ -66,13 +59,6 @@ class exports.PeriodicClient
         @_serverAddrs = addrs[...@serverCount]
         @_log.trace "Instantiated. " +
                     "(hostId=#{@hostId}, serverAddrs.length=#{@_serverAddrs.length})"
-
-    # Creates a (hopefully) unique connection id.
-    # @return [String] connection id
-    # @private
-    @_createConnId: ->
-        "#{commons.formatTime('YYYYMMDD-hhmmss.SSS')}-" +
-        printf("%08X", commons.randInt(0, 0xFFFFFFFF))
 
     # Generates random flow lifetime using `lifetime` and `lifetimeThreshold`.
     # @return [Integer] lifetime in milliseconds
