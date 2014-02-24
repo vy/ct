@@ -5,7 +5,7 @@ net = require "net"
 commons = require "../commons"
 
 
-describe "client test suite", ->
+describe "periodic client test suite", ->
 
 	it "should initiate a single connection", (done) ->
 		serverAddr = "127.0.0.1"
