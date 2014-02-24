@@ -22,6 +22,11 @@ restartDamper = (iniWaitPeriod, maxWaitPeriod, body) ->
     run()
 
 
+# Cross-traffic client implementation that generates periodic concurrent flows.
+#
+# `PeriodicClient` generates `connCount` concurrent connections to the servers
+# specified by `serverSubnet` and `serverCount`. Each flow has a random lifetime
+# of `lifetime±lifetimeThreshold`.
 class exports.PeriodicClient extends client.Client
 
     # @property [logger.Logger] instance logger
