@@ -110,10 +110,10 @@ Random Cross-Traffic Client
 
 	Missing required arguments: s, n, h
 
-Port Exhaustion due to `TIME-WAIT` Sockets
-==========================================
+Caveats
+=================
 
-While periodic client keeps the socket creation rate at a regular pace, random client can quickly exhaust the available port space due to `TIME-WAIT` sockets in a few seconds. In order to alleviate this problem, you might consider enabling TCP time-wait socket recycling (that is, `net.ipv4.tcp_tw_recycle`) in the kernel.
+While periodic client keeps the socket creation rate at a regular pace, random clients can quickly exhaust the available port space due to `TIME-WAIT` sockets in a few seconds. In order to alleviate this problem, you might consider enabling TCP time-wait socket recycling (that is, `net.ipv4.tcp_tw_recycle`) in the kernel.
 
 License
 =======
