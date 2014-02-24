@@ -3,7 +3,9 @@
 Rationale
 =========
 
-In order to test custom software-defined networks built using [mininet](http://www.mininet.org/), I needed a tool to stress test the network capacity with latency and throughput measurements. The tools I found so far on the web either measure latency or throughput, but not both of them at the same time over the same data flow. Hence, I came up with my own implementation.
+In order to test custom software-defined networks built using [mininet](http://www.mininet.org/), I needed a tool to stress test the network data plane capacity in terms of latency and throughput. The tools I found so far on the web either measure latency or throughput, but not both of them simultaneously over the same data flow. Hence, I came up with my own implementation, called `ct`.
+
+In a nutshell, `ct` provides a server and a set of client applications, where each type of client conveys a different type of flow generation scheme. In the overall picture, multiple clients continuously pump data to the given servers over TCP. In the meantime, servers collect throughput and latency statistics on a per client basis.
 
 Installation
 ============
@@ -33,7 +35,7 @@ For a complete list of all available build options, run `cake` without any param
 Usage
 =====
 
-`ct` ships two executables: `server.js`
+`ct` ships a single server executable: `server.exec.js`.
 
 	$ node out/exec/server.exec.js
 	Start the cross-traffic server.
@@ -44,7 +46,12 @@ Usage
 
 	Missing required arguments: f
 
-and `periodicClient.js`.
+By default there are two types of clients shipped as follows.
+
+Periodic Cross-Traffic Client
+-----------------------------
+
+`periodicClient.exec.js` generates (and maintains) given number of concurrent connections to the specified set of servers. Generated flows has a constant lifetime with a parametrized variation.
 
 	$ node out/exec/periodicClient.exec.js
 	Start the periodic cross-traffic client.
@@ -60,7 +67,7 @@ and `periodicClient.js`.
 
 	Missing required arguments: s, n, c, h, l, t
 
-In your `mininet` setup, start `ct` servers on server hosts as follows.
+You can employ `periodicClient.exec.js` in your `mininet` setup as follows. First, start a set of `ct` servers on server hosts:
 
 	$ node out/exec/server.exec.js --reportFile /tmp/server.dat
 
@@ -74,7 +81,7 @@ Next, start clients by providing necessary command line arguments.
 		--lifetime 10000 \
 		--lifetimeThreshold 3000
 
-Here, we start a client that is supposed to connect two servers in subnet `10.1.0.0/16`. Since `nServers` is set to `2`, client will try to connect servers with IP addresses `10.1.0.1` and `10.1.0.2`. Further, client will try to maintain `nConns=10` concurrent connections at a time. (The server for each connection will be picked randomly.) `hostId` is the identifier of the current client. Server will use this information to differentiate statistics for each client in the reports. `lifetime` and `lifetimeThreshold` instructs client to generate flows with a lifetime of 10±3 seconds.
+Here, we start a client that is supposed to connect two servers in subnet `10.1.0.0/16`. Since `nServers` is set to `2`, client will try to connect servers with IP addresses `10.1.0.1` and `10.1.0.2`. Further, client will try to maintain `nConns=10` concurrent connections at a time. (The server for each connection will be picked randomly.) `hostId` is the identifier of the current client. Server will use this information to differentiate statistics for each client in the reports. `lifetime=10000` and `lifetimeThreshold=3000` instructs client to generate flows with a lifetime of 10±3 seconds.
 
 A client continuously pushes data over TCP to the servers using given number of concurrent connections. When you interrupt a server (via `^C`) it will write down the statistics collected so far to the specified `reportFile` as follows.
 
@@ -86,6 +93,27 @@ A client continuously pushes data over TCP to the servers using given number of 
 	total connection throughput: 0.0010692720563569272 conns/ms
 
 Note that *data throughput to host 1* is nearly 10-times less than the *total data throughput*. This is due to the fact that, first we compute the throughput of each flow individually and then take the mean of these individual throughputs to compute the throughput of a single host. Hence, since there are 10 concurrent connections, *(data throughput to host 1) x 10 ~= total data throughput*.
+
+Random Cross-Traffic Client
+---------------------------
+
+`randomClient.exec.js` generates instantaneous flows to the specified set of servers. While doing so, flow inter-arrival time is set to be exponentially distributed and flow lifetimes are picked randomly from the range `[0, 10)`.
+
+	$ node out/exec/randomClient.exec.js
+	Start the random cross-traffic client.
+	Usage: node ./out/exec/randomClient.exec.js
+
+	Options:
+	  -s, --serverSubnet  server address subnet (e.g., 10.1.0.0/16)  [required]
+	  -n, --nServers      number of servers                          [required]
+	  -h, --hostId        host id                                    [required]
+
+	Missing required arguments: s, n, h
+
+Port Exhaustion due to `TIME-WAIT` Sockets
+==========================================
+
+While periodic client keeps the socket creation rate at a regular pace, random client can quickly exhaust the available port space due to `TIME-WAIT` sockets in a few seconds. In order to alleviate this problem, you might consider enabling TCP time-wait socket recycling (that is, `net.ipv4.tcp_tw_recycle`) in the kernel.
 
 License
 =======
