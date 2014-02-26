@@ -18,12 +18,12 @@ _spawnProcess = (file, args) ->
 
 compile = (watch) ->
     args = ["-c", "-o", _OUT_DIR, _SRC_DIR]
-    args = ["-w"].concat(args) if watch?
+    args = ["-w"].concat(args) if watch
     _spawnProcess _bin("coffee"), args
 
-task "compile", "Compile CoffeeScript sources in '#{_SRC_DIR}' to '#{_OUT_DIR}'", compile
+task "compile", "Compile CoffeeScript sources in '#{_SRC_DIR}' to '#{_OUT_DIR}'", -> compile false
 
-task "watch", "Watch '#{_SRC_DIR}' for changes", -> compile(true)
+task "watch", "Watch '#{_SRC_DIR}' for changes", -> compile true
 
 
 doc = -> _spawnProcess _bin("codo"), [_SRC_DIR]
