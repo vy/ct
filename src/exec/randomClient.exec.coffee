@@ -1,23 +1,27 @@
 # Parse command line arguments.
 {argv} = require "optimist"
     .usage "Start the random cross-traffic client.\nUsage: $0"
-    .demand "s"
-    .alias "s", "serverSubnet"
-    .describe "s", "server address subnet (e.g., 10.1.0.0/16)"
-    .string "s"
-    .demand "n"
-    .alias "n", "nServers"
-    .describe "n", "number of servers"
+    .demand "f"
+    .alias "f", "serverAddressFile"
+    .describe "f", "file containing list of server addresses in JSON"
+    .string "f"
     .demand "h"
     .alias "h", "hostId"
     .describe "h", "host id"
     .string "h"
 
-{Netmask} = require "netmask"
-{RandomClient} = require "../randomClient"
-serverSubnet = new Netmask argv.serverSubnet
-client = new RandomClient serverSubnet, argv.nServers, argv.hostId
-client.start()
-process.on "SIGINT", ->
-    client.stop()
-    process.exit()
+
+require("fs").readFile argv.serverAddressFile, (err, data) ->
+    throw "Failed opening '#{serverAddressFile}': #{err}" if err?
+    serverAddresses = JSON.parse(data)
+    {isValidIPv4Address} = require "../commons"
+    for serverAddress in serverAddresses
+        unless isValidIPv4Address serverAddress
+            throw "Invalid IPv4 address: #{serverAddress}"
+
+    {RandomClient} = require "../randomClient"
+    client = new RandomClient serverAddresses, argv.hostId
+    client.start()
+    process.on "SIGINT", ->
+        client.stop()
+        process.exit()
