@@ -35,27 +35,17 @@ class exports.RandomClient extends client.Client
     # @private
     _producers: {}
 
-    # @property [netmask.Netmask] server network subnet
-    serverSubnet: null
-
-    # @property [Integer] number of servers
-    serverCount: null
-
     # @property [Array<String>] server addresses
-    # @private
-    _serverAddrs: null
+    serverAddresses: null
 
     # @param [netmask.Netmask] serverSubnet server network subnet
     # @param [Integer] serverCount number of servers
     # @param [Integer] hostId host id
-    constructor: (@serverSubnet, @serverCount, @hostId) ->
+    constructor: (@serverAddresses, @hostId) ->
         @_log = new logger.Logger("RandomClient")
         @_log.setLevel("WARN")
-        addrs = []
-        @serverSubnet.forEach (addr) -> addrs.push addr
-        @_serverAddrs = addrs[...@serverCount]
         @_log.trace "Instantiated. " +
-                    "(hostId=#{@hostId}, serverAddrs.length=#{@_serverAddrs.length})"
+                    "(hostId=#{@hostId}, serverAddresses.length=#{@serverAddresses.length})"
 
     # Generates random flow lifetime using U[0, 10).
     # @private
@@ -81,7 +71,7 @@ class exports.RandomClient extends client.Client
                     @_log.error "[#{connId}] Connection failure: #{err}" if err?
                     @_log.debug "[#{connId}] Connection expired." if mp.expired
         @_log.trace "[#{connId}] Connecting..."
-        serverAddr = @_serverAddrs[commons.randInt(0, @_serverAddrs.length)]
+        serverAddr = @serverAddresses[commons.randInt(0, @serverAddresses.length)]
         socket.connect commons.serverDataPort, serverAddr
         socket.on "connect", => @_log.trace "[#{connId}] Connected."
         setTimeout (=> @_startProducer()), RandomClient._randomFlowInterArrivalTime() if @_running
