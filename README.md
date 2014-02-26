@@ -10,7 +10,11 @@ In a nutshell, `ct` provides a server and a set of client applications, where ea
 Installation
 ============
 
-`ct` is written in CoffeeScript on top of NodeJS framework for efficient stream handling and low system overhead. You need to have `npm`, `cake`, and `node` to install, compile and run the program, respectively.
+`ct` is written in CoffeeScript on top of NodeJS framework for efficient stream handling and low system overhead. You need to have `npm`, `cake`, and `node` to install, compile and run the program, respectively. On a GNU/Linux Ubuntu system you can install this toolset as follows.
+
+	$ sudo apt-get install nodejs npm
+	$ sudo npm install -g coffee-script
+	$ sudo ln -s /usr/bin/nodejs /usr/bin/node
 
 First, you need to clone the repository to your local machine.
 
@@ -31,6 +35,14 @@ Further, you can run unit tests to verify the integrity of the installation.
 	~/ct$ cake test
 
 For a complete list of all available build options, run `cake` without any parameters.
+
+	~/ct$ cake
+	Cakefile defines the following tasks:
+
+	cake compile              # Compile CoffeeScript sources in 'src' to 'out'
+	cake watch                # Watch 'src' for changes
+	cake doc                  # Create the documentation from sources
+	cake test                 # Run test suites
 
 Usage
 =====
