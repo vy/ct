@@ -24,9 +24,9 @@ restartDamper = (iniWaitPeriod, maxWaitPeriod, body) ->
 
 # Cross-traffic client implementation that generates periodic concurrent flows.
 #
-# `PeriodicClient` generates `connCount` concurrent connections to the servers
-# specified by `serverSubnet` and `serverCount`. Each flow has a random lifetime
-# of `lifetime±lifetimeThreshold`.
+# `PeriodicClient` generates `connCount` concurrent connections to the given
+# set of `serverAddresses`. Each flow has a random lifetime
+# of `lifetime±lifetimeVariance`.
 class exports.PeriodicClient extends client.Client
 
     # @property [logger.Logger] instance logger
@@ -37,15 +37,8 @@ class exports.PeriodicClient extends client.Client
     # @private
     _producers: {}
 
-    # @property [netmask.Netmask] server network subnet
-    serverSubnet: null
-
-    # @property [Integer] number of servers
-    serverCount: null
-
     # @property [Array<String>] server addresses
-    # @private
-    _serverAddrs: null
+    serverAddresses: null
 
     # @property [Integer] number of concurrent connections
     connCount: null
@@ -55,22 +48,19 @@ class exports.PeriodicClient extends client.Client
     # @param [Integer] connCount number of concurrent connections
     # @param [Integer] hostId host id
     # @param [Integer] lifetime flow lifetime in milliseconds
-    # @param [Integer] lifetimeThreshold variation window of the flow lifetime
-    constructor: (@serverSubnet, @serverCount, @connCount, @hostId, @lifetime, @lifetimeThreshold) ->
+    # @param [Integer] lifetimeVariance variation window of the flow lifetime
+    constructor: (@serverAddresses, @connCount, @hostId, @lifetime, @lifetimeVariance) ->
         @_log = new logger.Logger("PeriodicClient")
         @_log.setLevel("WARN")
-        addrs = []
-        @serverSubnet.forEach (addr) -> addrs.push addr
-        @_serverAddrs = addrs[...@serverCount]
         @_log.trace "Instantiated. " +
-                    "(hostId=#{@hostId}, serverAddrs.length=#{@_serverAddrs.length})"
+                    "(hostId=#{@hostId}, serverAddrs.length=#{@serverAddresses.length})"
 
-    # Generates random flow lifetime using `lifetime` and `lifetimeThreshold`.
+    # Generates random flow lifetime using `lifetime` and `lifetimeVariance`.
     # @return [Integer] lifetime in milliseconds
     # @private
     _randLifetime: ->
-        lo = @lifetime - @lifetimeThreshold
-        up = @lifetime + @lifetimeThreshold
+        lo = @lifetime - @lifetimeVariance
+        up = @lifetime + @lifetimeVariance
         commons.randInt(lo, up)
 
     # Initiates a new producer.
@@ -78,7 +68,7 @@ class exports.PeriodicClient extends client.Client
     _startProducer: ->
         restartDamper 100, message.MessageProducer.timeoutPeriod, (restart) =>
             connId = PeriodicClient._createConnId()
-            serverAddr = @_serverAddrs[commons.randInt(0, @_serverAddrs.length)]
+            serverAddr = @serverAddresses[commons.randInt(0, @serverAddresses.length)]
             socket = new net.Socket()
             lifetime = @_randLifetime()
             @_producers[connId] = mp =

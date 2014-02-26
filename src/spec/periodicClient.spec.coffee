@@ -11,8 +11,7 @@ describe "periodic client test suite", ->
 		serverAddr = "127.0.0.1"
 		connCount = 1
 		hostId = 0xDEAD
-		subnet = new Netmask "#{serverAddr}/32"
-		client = new PeriodicClient subnet, 1, connCount, hostId, 10000, 0
+		client = new PeriodicClient [serverAddr], connCount, hostId, 10000, 0
 		server = net.createServer()
 		server.on "error", -> done false
 		server.listen commons.serverDataPort, serverAddr, 1, ->
@@ -26,8 +25,7 @@ describe "periodic client test suite", ->
 		serverAddr = "127.0.0.1"
 		connCount = 10
 		hostId = 0xDEAD
-		subnet = new Netmask "#{serverAddr}/32"
-		client = new PeriodicClient subnet, 1, connCount, hostId, 10000, 0
+		client = new PeriodicClient [serverAddr], connCount, hostId, 10000, 0
 		server = net.createServer()
 		server.on "error", -> done false
 		server.listen commons.serverDataPort, serverAddr, 1, ->
