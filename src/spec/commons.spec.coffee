@@ -124,3 +124,8 @@ describe "commons test suite", ->
             newObj = commons.toObject pairs
             keys = (key for key of orgObj)
             expect(keys.every (key) -> newObj[key] = orgObj[key]).toBe(true)
+
+    it "isValidIPv4Address should work as advertised", ->
+        expect(commons.isValidIPv4Address "255.255.255.255").toBe(true)
+        expect(commons.isValidIPv4Address "0.0.0.0").toBe(true)
+        expect(commons.isValidIPv4Address "0.0.256.0").toBe(false)

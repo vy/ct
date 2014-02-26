@@ -124,3 +124,13 @@ exports.toObject = (pairs) ->
     obj = {}
     obj[key] = value for [key, value] in pairs
     obj
+
+
+# Returns `true` if the given `address` is a valid IPv4 address, `false` otherwise.
+exports.isValidIPv4Address = (address) ->
+    address.match(///\b
+        (25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.
+        (25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.
+        (25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.
+        (25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
+        \b///)?
